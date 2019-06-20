@@ -2,7 +2,7 @@
   display:flex;
 }
 
-.board {
+.gamePage {
   margin: 0 auto;
 }
 
@@ -53,16 +53,27 @@ h1 {
   text-align: center;
 }
 
+td:hover{
+    background-color: lightgrey;
+}
+
+
 .space {
   text-align: center;
   font-size: 100px;
   opacity: 0;
+  /* color: transparent; */
 }
 
 .space:hover{
   cursor:pointer;
+  /* background-color: grey; */
 }
 
 .click {
   opacity: 1;
+}
+
+.click:active { 
+  background:red;
 }

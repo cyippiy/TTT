@@ -17,7 +17,7 @@ class Board extends React.Component {
                     "O": 0   
                     },
             gameOver: false,
-            winner: ""
+            winner: "",
         }
         this.resetBoard = this.resetBoard.bind(this);
         this.resetScore = this.resetScore.bind(this);
@@ -43,8 +43,6 @@ class Board extends React.Component {
             // console.log(e.currentTarget);
             if(e.currentTarget.dataset.index){
                 let space = e.currentTarget.dataset.index.split("-");
-                // console.log("CLICK");
-                // console.log(this.state.board[parseInt(space[0])][parseInt(space[1])]);
                 if (this.state.board[parseInt(space[0])][parseInt(space[1])] === -1) {
                     e.target.innerHTML = this.state.players[this.state.turnCount % 2];
                     let new_board = JSON.parse(JSON.stringify(this.state.board));
@@ -114,14 +112,8 @@ class Board extends React.Component {
                 }
             }
         }
-        // let status = document.querySelector("#status");
         if (winner) {
             if (this.state.gameOver === false) {
-                // this.status.innerHTML += winner;
-                // this.status.classList.toggle('active');
-                // turnStatus.innerHTML = " ";
-                // score[winner]++;
-                // updateScore();
                 this.updateScore(winner);
             }
             this.setState({
@@ -131,11 +123,6 @@ class Board extends React.Component {
             this.setState({
                 gameOver: true
             });
-            // this.status.innerHTML = "DRAW GAME"
-            // this.status.classList.toggle('active');
-            // status.classList.add('draw');
-            // turnStatus.innerHTML = " ";
-            
         }
 
     }
@@ -144,25 +131,22 @@ class Board extends React.Component {
 
     render(){
         let turnDisplay;
-            if (this.state.gameOver === true){
-                let winner
-                turnDisplay = <tr><th>{this.state.winner === "" ? "Draw Game" : `${this.state.winner} WINS!`}</th></tr>
-            }else{
-                    turnDisplay = <tr><th>Turn:</th><th id="turn">{this.state.gameOver === true ? " " : this.state.players[this.state.turnCount % 2]}</th></tr>;
-            }
+        if (this.state.gameOver === true){
+            turnDisplay = <tr><th>{this.state.winner === "" ? "Draw Game" : `${this.state.winner} WINS!`}</th></tr>
+        }else{
+            turnDisplay = <tr><th>Turn:</th><th id="turn">{this.state.players[this.state.turnCount % 2]}</th></tr>;
+        }
 
 
         return (
-            <div className="board">
+            <div className="gamePage">
                 <h1>Tic Tac Toe</h1>
                 <h2 id="xScore">X: {this.state.score["X"]}</h2>
                 <h2 id="oScore">O: {this.state.score["O"]}</h2>
                 <h3 id="status">Winner: </h3>
                 <table id="board">
                     <thead>
-                        <tr>
                             {turnDisplay}
-                        </tr>
                     </thead>
                     <tbody>
                         <tr>
@@ -219,6 +203,7 @@ function checkDiagonalWinner(board) {
     }
     return false;
 }
+
 
 
 export default Board;
