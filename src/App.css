@@ -77,3 +77,47 @@ td:hover{
 .click:active { 
   background:red;
 }
+
+.winner {
+  background: lightskyblue;
+}
+
+.inactive:hover{
+  background:none;
+}
+.winner:hover{
+  background:lightskyblue;
+}
+
+.buttonRow{
+  margin: 20px;
+  display:flex;
+  justify-content: space-evenly;
+}
+
+button{
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  color: #fff;
+  background-color: #36b;
+  padding: 0.75em 1.5em;
+}
+
+.turnContainer{
+  display:flex;
+  justify-content: center;
+}
+
+.scoreBoard{
+  display:flex;
+  justify-content: space-around;
+}
+
+#x{
+  color:red;
+}
+
+#o{
+  color:blue;
+}

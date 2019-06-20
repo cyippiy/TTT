@@ -17,7 +17,6 @@ class Space extends React.Component{
     }
 
     render(){
-        let val = this.props.value === -1 ? " " : this.props.value;
         return (
             <div className="space" onClick={this.props.handleClick}>
                 {this.state.value}

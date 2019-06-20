@@ -25,45 +25,52 @@ class Board extends React.Component {
         this.resetBoard = this.resetBoard.bind(this);
         this.resetScore = this.resetScore.bind(this);
         this.checkWinner = this.checkWinner.bind(this);
-        this.status = document.querySelector("#status");
         this.updateScore = this.updateScore.bind(this);
+        this.updateWinnerBoard = this.updateWinnerBoard.bind(this);
+        this.markBoard = this.markBoard.bind(this);
     }
 
     componentDidUpdate(prevProps,prevState){
-        if (prevState.turnCount !== this.state.turnCount){
+        if (prevState.turnCount !== this.state.turnCount && prevState.gameOver === false){
             this.checkWinner();
         }
     }
 
+    markBoard(e){
+        let space = e.currentTarget.dataset.index.split("-");
+        if (this.state.board[parseInt(space[0])][parseInt(space[1])] === -1) {
+            e.target.innerHTML = this.state.players[this.state.turnCount % 2];
+            let new_board = JSON.parse(JSON.stringify(this.state.board));
+            new_board[parseInt(space[0])][parseInt(space[1])] = this.state.players[this.state.turnCount % 2];
+            e.target.classList.add('click');
+            this.setState({
+                board: new_board,
+                turnCount: this.state.turnCount + 1,
+            });
+        }
+    }
+
+
     handleClick(e){
-        // console.log(this.state.board);
-        // console.log(e.target);
         this.checkWinner();
         if (!this.state.gameOver){
-            // console.log(e.currentTarget);
             if(e.currentTarget.dataset.index){
-                let space = e.currentTarget.dataset.index.split("-");
-                if (this.state.board[parseInt(space[0])][parseInt(space[1])] === -1) {
-                    e.target.innerHTML = this.state.players[this.state.turnCount % 2];
-                    let new_board = JSON.parse(JSON.stringify(this.state.board));
-                    new_board[parseInt(space[0])][parseInt(space[1])] = this.state.players[this.state.turnCount % 2];
-                    // console.log(e.target);
-                    e.target.classList.add('click');
-                    this.setState({
-                        board:new_board,
-                        turnCount: this.state.turnCount+1,
-                    });
-                    this.checkWinner();
-                }
+                this.markBoard(e);
             }
         }
     }
 
+
     resetBoard(){
-        let spaces = document.querySelectorAll('.space');
-        spaces.forEach(space => {
-            space.classList.remove('click')
+        let td_space = document.querySelectorAll(`td[data-index]`);
+        td_space.forEach(space => {
+            space.classList.remove('winner');
+            space.classList.remove('inactive');
         });
+        let spaces = document.querySelectorAll('.space');
+        spaces.forEach(space=> {
+            space.classList.remove('click');
+        })
         this.setState({
             board: [
                 [-1, -1, -1],
@@ -95,26 +102,38 @@ class Board extends React.Component {
         })
     }
 
+    updateWinnerBoard(arr){
+        arr.forEach(cord => {
+            document.querySelector(`td[data-index='${cord}']`).classList.add("winner");
+        });
+        let td_space = document.querySelectorAll(`td[data-index]`);
+        td_space.forEach(space => {
+            space.classList.add('inactive');
+        });
+
+    }
+
     checkWinner() {
         let winner = null;
         let diagonal = checkDiagonalWinner(this.state.board);
         let col = checkColWinner(this.state.board);
-
+        let coordinates;
         if (diagonal) {
             winner = diagonal;
         } else if (col) {
             winner = col;
         } else {
             for (let i = 0; i < this.state.board.length; i++) {
-                let row = checkRowWinner(this.state.board[i])
-                if (row) {
-                    winner = row;
+                if (checkRowWinner(this.state.board[i])) {
+                    winner = [`${i}-0`, `${i}-1`, `${i}-2`];
                 }
             }
         }
         if (winner) {
             if (this.state.gameOver === false) {
-                this.updateScore(winner);
+                coordinates = winner[0].split("-");
+                this.updateScore(this.state.board[coordinates[0]][coordinates[1]]);
+                this.updateWinnerBoard(winner);
             }
             this.setState({
                gameOver: true
@@ -132,22 +151,23 @@ class Board extends React.Component {
     render(){
         let turnDisplay;
         if (this.state.gameOver === true){
-            turnDisplay = <tr><th>{this.state.winner === "" ? "Draw Game" : `${this.state.winner} WINS!`}</th></tr>
+            turnDisplay = <h2 id="turn">{this.state.winner === "" ? "Draw Game" : `${this.state.winner} WINS!`}</h2>
         }else{
-            turnDisplay = <tr><th>Turn:</th><th id="turn">{this.state.players[this.state.turnCount % 2]}</th></tr>;
+            turnDisplay = <h2 id="turn">Turn: {this.state.players[this.state.turnCount % 2]}</h2>;
         }
 
 
         return (
             <div className="gamePage">
                 <h1>Tic Tac Toe</h1>
-                <h2 id="xScore">X: {this.state.score["X"]}</h2>
-                <h2 id="oScore">O: {this.state.score["O"]}</h2>
-                <h3 id="status">Winner: </h3>
+                <div className="scoreBoard">
+                    <h2 id="xScore"><strong id="x">X:</strong> {this.state.score["X"]}</h2>
+                    <h2 id="oScore"><strong id="o">O:</strong> {this.state.score["O"]}</h2>
+                </div>
+                <div className="turnContainer">
+                    {turnDisplay}
+                </div>
                 <table id="board">
-                    <thead>
-                            {turnDisplay}
-                    </thead>
                     <tbody>
                         <tr>
                             <td data-index="0-0" onClick={this.handleClick}><Space value={this.state.board[0][0]} /></td>
@@ -166,8 +186,10 @@ class Board extends React.Component {
                         </tr>
                     </tbody>
                 </table>
-                <button onClick={this.resetBoard}>Reset Board</button>
-                <button onClick={this.resetScore}>Reset Scores</button>
+                <div className="buttonRow">
+                    <button onClick={this.resetBoard}>Reset Board</button>
+                    <button onClick={this.resetScore}>Reset Scores</button>
+                </div>
             </div>
         )
     }
@@ -181,16 +203,16 @@ function transpose(matrix) {
 function checkRowWinner(arr) {
     if (arr[0] === -1) return false;
     if (arr[0] === arr[1] && arr[1] === arr[2]) {
-        return arr[0];
+        return true;
     }
     return false;
 }
 function checkColWinner(board) {
     let copyBoard = transpose(board)
     for (let i = 0; i < board.length; i++) {
-        let temp = checkRowWinner(copyBoard[i]);
-        if (temp) {
-            return temp;
+        if (checkRowWinner(copyBoard[i])) {
+            return [`0-${i}`, `1-${i}`, `2-${i}`];
+
         }
     }
     return false;
@@ -198,8 +220,10 @@ function checkColWinner(board) {
 
 function checkDiagonalWinner(board) {
     if (board[1][1] === -1) return false;
-    if ((board[0][0] === board[1][1] && board[1][1] === board[2][2]) || (board[0][2] === board[1][1] && board[1][1] === board[2][0])) {
-        return board[1][1];
+    if (board[0][0] === board[1][1] && board[1][1] === board[2][2]){
+        return ["0-0", "1-1", "2-2"];
+    }else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
+        return ["0-2", "1-1", "2-0"];
     }
     return false;
 }
