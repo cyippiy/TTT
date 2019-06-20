@@ -26,6 +26,7 @@ td {
   border: solid;
   border-width: 0 1px;
   text-align: center;
+  justify-content: center;
 }
 
 td:first-child {
@@ -50,4 +51,18 @@ h3 {
 
 h1 {
   text-align: center;
+}
+
+.space {
+  text-align: center;
+  font-size: 100px;
+  opacity: 0;
+}
+
+.space:hover{
+  cursor:pointer;
+}
+
+.click {
+  opacity: 1;
 }
