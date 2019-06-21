@@ -28,6 +28,9 @@ class Board extends React.Component {
         this.updateScore = this.updateScore.bind(this);
         this.updateWinnerBoard = this.updateWinnerBoard.bind(this);
         this.markBoard = this.markBoard.bind(this);
+        this.checkRowWinner = this.checkRowWinner.bind(this);
+        this.checkColWinner = this.checkColWinner.bind(this);
+        this.checkDiagonalWinner = this.checkDiagonalWinner.bind(this);
     }
 
     componentDidUpdate(prevProps,prevState){
@@ -110,13 +113,39 @@ class Board extends React.Component {
         td_space.forEach(space => {
             space.classList.add('inactive');
         });
+    }
 
+    checkRowWinner(arr) {
+        if (arr[0] === -1) return false;
+        if (arr[0] === arr[1] && arr[1] === arr[2]) {
+            return true;
+        }
+        return false;
+    }
+    checkColWinner(board) {
+        let copyBoard = transpose(board)
+        for (let i = 0; i < board.length; i++) {
+            if (this.checkRowWinner(copyBoard[i])) {
+                return [`0-${i}`, `1-${i}`, `2-${i}`];
+            }
+        }
+        return false;
+    }
+
+    checkDiagonalWinner(board) {
+        if (board[1][1] === -1) return false;
+        if (board[0][0] === board[1][1] && board[1][1] === board[2][2]) {
+            return ["0-0", "1-1", "2-2"];
+        } else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
+            return ["0-2", "1-1", "2-0"];
+        }
+        return false;
     }
 
     checkWinner() {
         let winner = null;
-        let diagonal = checkDiagonalWinner(this.state.board);
-        let col = checkColWinner(this.state.board);
+        let diagonal = this.checkDiagonalWinner(this.state.board);
+        let col = this.checkColWinner(this.state.board);
         let coordinates;
         if (diagonal) {
             winner = diagonal;
@@ -124,7 +153,7 @@ class Board extends React.Component {
             winner = col;
         } else {
             for (let i = 0; i < this.state.board.length; i++) {
-                if (checkRowWinner(this.state.board[i])) {
+                if (this.checkRowWinner(this.state.board[i])) {
                     winner = [`${i}-0`, `${i}-1`, `${i}-2`];
                 }
             }
@@ -143,19 +172,19 @@ class Board extends React.Component {
                 gameOver: true
             });
         }
-
     }
-
-
 
     render(){
         let turnDisplay;
         if (this.state.gameOver === true){
-            turnDisplay = <h2 id="turn">{this.state.winner === "" ? "Draw Game" : `${this.state.winner} WINS!`}</h2>
+            turnDisplay = <h2 id="turn">
+            {this.state.winner === "" ? "Draw Game" : `${this.state.winner} WINS!`}
+            </h2>
         }else{
-            turnDisplay = <h2 id="turn">Turn: {this.state.players[this.state.turnCount % 2]}</h2>;
+            turnDisplay = <h2 id="turn">
+                Turn: {this.state.players[this.state.turnCount % 2]}
+                </h2>;
         }
-
 
         return (
             <div className="gamePage">
@@ -194,40 +223,10 @@ class Board extends React.Component {
         )
     }
 }
-
 //credit to https://stackoverflow.com/users/583651/fawad-ghafoor
 function transpose(matrix) {
     return matrix[0].map((col, i) => matrix.map(row => row[i]));
 }
-
-function checkRowWinner(arr) {
-    if (arr[0] === -1) return false;
-    if (arr[0] === arr[1] && arr[1] === arr[2]) {
-        return true;
-    }
-    return false;
-}
-function checkColWinner(board) {
-    let copyBoard = transpose(board)
-    for (let i = 0; i < board.length; i++) {
-        if (checkRowWinner(copyBoard[i])) {
-            return [`0-${i}`, `1-${i}`, `2-${i}`];
-
-        }
-    }
-    return false;
-}
-
-function checkDiagonalWinner(board) {
-    if (board[1][1] === -1) return false;
-    if (board[0][0] === board[1][1] && board[1][1] === board[2][2]){
-        return ["0-0", "1-1", "2-2"];
-    }else if (board[0][2] === board[1][1] && board[1][1] === board[2][0]) {
-        return ["0-2", "1-1", "2-0"];
-    }
-    return false;
-}
-
 
 
 export default Board;
