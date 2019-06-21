@@ -223,10 +223,8 @@ class Board extends React.Component {
         )
     }
 }
-//credit to https://stackoverflow.com/users/583651/fawad-ghafoor
 function transpose(matrix) {
     return matrix[0].map((col, i) => matrix.map(row => row[i]));
 }
-
 
 export default Board;
